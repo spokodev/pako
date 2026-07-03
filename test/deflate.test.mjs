@@ -8,7 +8,9 @@ import {
   inflate,
   inflateRaw,
   Z_FULL_FLUSH,
-  Z_SYNC_FLUSH
+  Z_SYNC_FLUSH,
+  Z_TREES,
+  Z_STREAM_ERROR
 } from '../src/index.ts';
 import assert from 'assert';
 import fs from 'fs';
@@ -105,5 +107,13 @@ describe('deflate misc', () => {
     const inflatedPakoData = inflate(deflatedPakoData);
 
     assert.strictEqual(data.length, inflatedPakoData.length);
+  });
+
+  it('should not hang on wrong flush mode', () => {
+    const deflate = new Deflate();
+    const ret = deflate.push('abc', Z_TREES);
+
+    assert.strictEqual(ret, false);
+    assert.strictEqual(deflate.err, Z_STREAM_ERROR);
   });
 });

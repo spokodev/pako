@@ -16,7 +16,7 @@ const toString = Object.prototype.toString;
 
 import {
   Z_NO_FLUSH, Z_SYNC_FLUSH, Z_FULL_FLUSH, Z_FINISH,
-  Z_OK, Z_STREAM_END,
+  Z_OK, Z_STREAM_END, Z_STREAM_ERROR,
   Z_DEFAULT_COMPRESSION,
   Z_DEFAULT_STRATEGY,
   Z_DEFLATED
@@ -273,6 +273,9 @@ class Deflate {
       }
 
       status = zlibDeflate(strm, _flush_mode);
+
+      // Hard error (e.g. an unsupported flush mode): stop instead of looping forever.
+      if (status === Z_STREAM_ERROR) break;
 
       // Ended => flush the tail and finalize with the deflateEnd status.
       if (status === Z_STREAM_END) {
